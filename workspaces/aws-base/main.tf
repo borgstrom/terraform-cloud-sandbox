@@ -2,29 +2,25 @@
 
 provider "aws" {
     version = "~> 3.14"
+    region = "us-east-2"
+    alias = "us-east-2"
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] # Canonical
+provider "aws" {
+    region = "us-west-2"
+    alias = "us-west-2"
 }
 
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
+module "easty" {
+    source = "../../modules/helloworld"
+    providers = {
+        aws = "aws.us-east-2"
+    }
+}
 
-  tags = {
-    Name = "HelloWorld"
-  }
+module "westy" {
+    source = "../../modules/helloworld"
+    providers = {
+        aws = "aws.us-west-2"
+    }
 }
